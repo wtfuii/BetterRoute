@@ -460,80 +460,12 @@ Navigation → Match URL → Redirect? → Build RouterState → Leave Guards �
 
 ## Future Features
 
-The following features are designed but not yet implemented. See `docs/future/` for detailed design documents.
+The following features are designed but not yet implemented. See the linked design documents for details.
 
-### Catch-All Segments ([docs/future/catch-all-segments.md](docs/future/catch-all-segments.md))
-
-**Status:** Planned
-
-A `*name` segment prefix to capture the entire remaining URL tail as a single string:
-
-```csharp
-new RouteDefinition("docs/*slug", typeof(DocsViewer));
-// /docs/guides/routing → Parameters["slug"] = "guides/routing"
-```
-
-Catch-all segments must be the **last** segment in the path, cannot have children, and have the lowest priority among siblings (literal > parameter > catch-all). Useful for documentation sites, section-level 404 handlers, and file-system-style explorers.
-
-### Route Transitions ([docs/future/transitions.md](docs/future/transitions.md))
-
-**Status:** Planned
-
-A `<RouterTransition>` component that wraps `<RouterOutlet>` to enable CSS-driven animated transitions between routes:
-
-```razor
-<RouterTransition Name="fade" Duration="200">
-    <RouterOutlet />
-</RouterTransition>
-```
-
-Supports direction-aware animation (`Forward` / `Back` / `Sibling` / `Replace`), respects `prefers-reduced-motion`, and provides `OnEnter`/`OnExit` callbacks for programmatic animation via the Web Animations API.
-
-### Scroll Restoration ([docs/future/scroll-restoration.md](docs/future/scroll-restoration.md))
-
-**Status:** Planned
-
-A `ScrollBehavior` hook on `BetterRouter` for controlling scroll position after navigation:
-
-```csharp
-<BetterRouter Routes="@Routes" ScrollBehavior="@MyScroll" />
-
-@code {
-    private ScrollTarget? MyScroll(NavigationContext ctx, ScrollPosition? saved)
-    {
-        if (ctx.IsPopState && saved is not null)
-            return new ScrollTarget.To(saved.X, saved.Y);  // restore on back
-
-        if (ctx.To.Fragment is not null)
-            return new ScrollTarget.Element(ctx.To.Fragment);  // scroll to anchor
-
-        return new ScrollTarget.To(0, 0);  // top on forward nav
-    }
-}
-```
-
-Saved positions live in `sessionStorage` for back/forward restoration. Includes a JS interop helper that respects `prefers-reduced-motion` for smooth scrolling.
-
-### Lazy / Async-Loaded Components ([docs/future/lazy-components.md](docs/future/lazy-components.md))
-
-**Status:** Planned
-
-On-demand assembly loading for routes to reduce initial bundle size in Blazor WebAssembly:
-
-```csharp
-new RouteDefinition("admin", typeof(AdminLayout), Children:
-[
-    new RouteDefinition("reports",
-        ComponentLoader: async () =>
-        {
-            await LazyAssemblyLoader.LoadAssembliesAsync(["MyApp.Admin.Reports.dll"]);
-            return typeof(MyApp.Admin.Reports.ReportsHome);
-        },
-        LoadingComponent: typeof(SpinnerComponent)),
-]);
-```
-
-A `ComponentLoader` factory replaces the eager `Component` — the router shows a `LoadingComponent` (or a global default) while the assembly loads, then re-renders once the type is resolved. Loaded types are cached in memory for subsequent visits; load failures are surfaced via `OnNavigationError`. When multiple lazy levels are hit in one match, assemblies load in parallel via `Task.WhenAll`. A `BetterRouter.PrefetchAsync(url)` method is planned as a follow-up for hover-based preloading.
+- **[Catch-All Segments](docs/future/catch-all-segments.md)** — `*name` segment prefix to capture the remaining URL tail as a single string.
+- **[Route Transitions](docs/future/transitions.md)** — `<RouterTransition>` component for CSS-driven animated transitions between routes.
+- **[Scroll Restoration](docs/future/scroll-restoration.md)** — `ScrollBehavior` hook on `BetterRouter` to control scroll position after navigation.
+- **[Lazy / Async-Loaded Components](docs/future/lazy-components.md)** — on-demand assembly loading for routes to reduce initial bundle size.
 
 ---
 
