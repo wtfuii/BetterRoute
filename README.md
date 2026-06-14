@@ -1,7 +1,7 @@
 # BetterRoute
 
 <p align="center">
-  <b>A tree-based routing library for Blazor — works with WASM, Server, and Web App (Auto / InteractiveServer / InteractiveWebAssembly)</b>
+  <b>A tree-based routing library for Blazor — works with WASM, Server, and Web App</b>
 </p>
 
 <p align="center">
