@@ -3,6 +3,12 @@ name: Publish to NuGet
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 1.0.0)'
+        required: true
+        type: string
 
 jobs:
   publish:
@@ -19,13 +25,17 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Extract version from release tag
+      - name: Extract version
         run: |
-          # Strip leading 'v' from release tag (v1.0.0 → 1.0.0)
-          VERSION="${{ github.event.release.tag_name }}"
-          VERSION="${VERSION#v}"
+          # From release: strip 'v' from tag. From workflow_dispatch: use input directly.
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Version from release tag: $VERSION"
+          echo "Version: $VERSION"
 
       - name: Restore dependencies
         run: dotnet restore BetterRoute.sln
