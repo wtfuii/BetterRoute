@@ -19,40 +19,4 @@
         <InternalsVisibleTo Include="BetterRoute.Tests"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <Content Include="..\docs\.DS_Store">
-        <Link>Routing\docs\.DS_Store</Link>
-      </Content>
-      <Content Include="..\docs\future\catch-all-segments.md">
-        <Link>Routing\docs\future\catch-all-segments.md</Link>
-      </Content>
-      <Content Include="..\docs\future\lazy-components.md">
-        <Link>Routing\docs\future\lazy-components.md</Link>
-      </Content>
-      <Content Include="..\docs\future\named-outlets.md">
-        <Link>Routing\docs\future\named-outlets.md</Link>
-      </Content>
-      <Content Include="..\docs\future\named-routes.md">
-        <Link>Routing\docs\future\named-routes.md</Link>
-      </Content>
-      <Content Include="..\docs\future\navigation-guards.md">
-        <Link>Routing\docs\future\navigation-guards.md</Link>
-      </Content>
-      <Content Include="..\docs\future\query-parameters.md">
-        <Link>Routing\docs\future\query-parameters.md</Link>
-      </Content>
-      <Content Include="..\docs\future\README.md">
-        <Link>Routing\docs\future\README.md</Link>
-      </Content>
-      <Content Include="..\docs\future\redirects-and-aliases.md">
-        <Link>Routing\docs\future\redirects-and-aliases.md</Link>
-      </Content>
-      <Content Include="..\docs\future\scroll-restoration.md">
-        <Link>Routing\docs\future\scroll-restoration.md</Link>
-      </Content>
-      <Content Include="..\docs\future\transitions.md">
-        <Link>Routing\docs\future\transitions.md</Link>
-      </Content>
-    </ItemGroup>
-
 </Project>
