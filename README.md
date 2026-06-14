@@ -509,6 +509,27 @@ A `ScrollBehavior` hook on `BetterRouter` for controlling scroll position after 
 
 Saved positions live in `sessionStorage` for back/forward restoration. Includes a JS interop helper that respects `prefers-reduced-motion` for smooth scrolling.
 
+### Lazy / Async-Loaded Components ([docs/future/lazy-components.md](docs/future/lazy-components.md))
+
+**Status:** Planned
+
+On-demand assembly loading for routes to reduce initial bundle size in Blazor WebAssembly:
+
+```csharp
+new RouteDefinition("admin", typeof(AdminLayout), Children:
+[
+    new RouteDefinition("reports",
+        ComponentLoader: async () =>
+        {
+            await LazyAssemblyLoader.LoadAssembliesAsync(["MyApp.Admin.Reports.dll"]);
+            return typeof(MyApp.Admin.Reports.ReportsHome);
+        },
+        LoadingComponent: typeof(SpinnerComponent)),
+]);
+```
+
+A `ComponentLoader` factory replaces the eager `Component` — the router shows a `LoadingComponent` (or a global default) while the assembly loads, then re-renders once the type is resolved. Loaded types are cached in memory for subsequent visits; load failures are surfaced via `OnNavigationError`. When multiple lazy levels are hit in one match, assemblies load in parallel via `Task.WhenAll`. A `BetterRouter.PrefetchAsync(url)` method is planned as a follow-up for hover-based preloading.
+
 ---
 
 ## License
