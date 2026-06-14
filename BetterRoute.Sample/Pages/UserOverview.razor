@@ -11,8 +11,7 @@
     <code>@State.ResolveUrl("user.post", new Dictionary<string, string> { ["userId"] = State.Parameters["userId"], ["postId"] = "7" })</code>
 </p>
 <p>
-    <a href="" @onclick="@(() => State.NavigateTo("user.post", new { userId = State.Parameters["userId"], postId = "7" }))"
-       @onclick:preventDefault="true">
-        Navigate to post 7 (via State.NavigateTo)
-    </a>
+    <RouteLink Name="user.post" Params="@(new Dictionary<string, string> { ["userId"] = State.Parameters["userId"], ["postId"] = "7" })">
+        Navigate to post 7 (via RouteLink Name)
+    </RouteLink>
 </p>

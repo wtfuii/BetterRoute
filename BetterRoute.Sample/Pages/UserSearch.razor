@@ -80,11 +80,12 @@
 
 <div style="margin-top: 16px;">
     <p><strong>Demo links:</strong></p>
+    @{ var uid = State.GetParameter("userId"); }
     <nav>
-        <a href="users/@State.GetParameter("userId")/search?q=blazor&sort=asc">?q=blazor&sort=asc</a> ·
-        <a href="users/@State.GetParameter("userId")/search?q=routing&tag=oss&tag=csharp">?q=routing&tag=oss&tag=csharp</a> ·
-        <a href="users/@State.GetParameter("userId")/search?bare">?bare (bare key)</a> ·
-        <a href="users/@State.GetParameter("userId")/search?page=2#results">?page=2#results</a> ·
-        <a href="users/@State.GetParameter("userId")/search">no params</a>
+        <RouteLink Href="@($"users/{uid}/search?q=blazor&sort=asc")">?q=blazor&sort=asc</RouteLink> ·
+        <RouteLink Href="@($"users/{uid}/search?q=routing&tag=oss&tag=csharp")">?q=routing&tag=oss&tag=csharp</RouteLink> ·
+        <RouteLink Href="@($"users/{uid}/search?bare")">?bare (bare key)</RouteLink> ·
+        <RouteLink Href="@($"users/{uid}/search?page=2#results")">?page=2#results</RouteLink> ·
+        <RouteLink Href="@($"users/{uid}/search")">no params</RouteLink>
     </nav>
 </div>

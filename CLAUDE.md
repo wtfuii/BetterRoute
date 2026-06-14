@@ -58,6 +58,7 @@ BetterRoute is a **tree-based client-side routing library for Blazor WebAssembly
 | `GuardResult` | Public abstract record — `Continue`, `Cancel`, or `Redirect(string)`; with static `Ok`/`Stop`/`To()` factories |
 | `GuardRegistrar` | Public sealed class — cascaded registrar for `IBeforeRouteLeave` components; manages registration/unregistration |
 | `IBeforeRouteLeave` | Public interface — `CanLeaveAsync(NavigationContext, CancellationToken)` for component-level leave guards |
+| `RouteLink` | Public Razor component — drop-in replacement for `<a>` that uses client-side navigation; supports path-based (`Href`) and named-route (`Name`+`Params`) modes |
 | `GuardPipeline` | Internal static — executes leave→beforeEach→enter phases; handles cancellation, errors, and redirect propagation |
 
 ### Navigation guards

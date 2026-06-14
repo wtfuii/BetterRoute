@@ -88,6 +88,23 @@ Replace the default `<Router>` with `<BetterRouter>` and define your route tree:
 
 No DI registration is needed — the router is used directly as a Blazor component.
 
+### 3. Use `<RouteLink>` for navigation
+
+Replace plain `<a>` tags with `<RouteLink>` to prevent full-page reloads:
+
+```razor
+@* Before: full page reload *@
+<a href="users/42/profile">Profile</a>
+
+@* After: client-side navigation *@
+<RouteLink Href="users/42/profile">Profile</RouteLink>
+
+@* Named-route navigation *@
+<RouteLink Name="user.post" Params="new { userId = 42, postId = 7 }">Post 7</RouteLink>
+```
+
+`RouteLink` automatically intercepts clicks, navigates client-side, and renders a proper `<a>` tag. Pass additional attributes like `class` or `style` and they are splatted onto the rendered element.
+
 ---
 
 ## Core Concepts
@@ -411,6 +428,16 @@ Set the `NotFound` parameter on `BetterRouter` to render a component when no rou
 | Parameter | Type | Description |
 |---|---|---|
 | `Name` | `string?` | When `null`, renders the default component at the next depth. When set, renders a named component at the same depth. |
+
+### `RouteLink`
+
+| Parameter | Type | Description |
+|---|---|---|
+| `Href` | `string?` | Target path for client-side navigation. Mutually exclusive with `Name`. |
+| `Name` | `string?` | Named route to navigate to. Uses `RouterState.ResolveUrl` for the href and `RouterState.NavigateTo` on click. Mutually exclusive with `Href`. |
+| `Params` | `object?` | Parameters for named-route navigation. Accepts `IReadOnlyDictionary<string, string>` or an anonymous object. Extra keys become query string parameters. |
+
+A drop-in replacement for `<a>` that prevents full-page reloads by using client-side navigation. Any additional attributes (`class`, `style`, `target`, etc.) are splatted onto the rendered `<a>` element.
 
 ---
 

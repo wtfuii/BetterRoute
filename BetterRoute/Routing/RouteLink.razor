@@ -1,0 +1,9 @@
+@namespace BetterRoute.Routing
+@inherits ComponentBase
+
+<a href="@_resolvedHref"
+   @onclick="OnClick"
+   @onclick:preventDefault="true"
+   @attributes="AdditionalAttributes">
+    @ChildContent
+</a>
