@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(dotnet --list-sdks)",
-      "Bash(dotnet --version)"
-    ]
-  }
-}
