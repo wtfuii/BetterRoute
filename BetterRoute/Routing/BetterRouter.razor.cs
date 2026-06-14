@@ -41,22 +41,42 @@ public partial class BetterRouter : ComponentBase, IDisposable
 
     private RouterState? Match(string absoluteUri)
     {
-        var path = ToRelativePath(absoluteUri);
+        var path = ToRelativePath(absoluteUri, out var queryString, out var fragment);
         if (!RouteMatcher.TryMatch(path, _compiled, out var matched))
             return null;
 
         var merged = MergeParameters(matched);
-        return new RouterState(matched, CurrentDepth: 0, merged, absoluteUri, path);
+        var query = QueryStringParser.Parse(queryString);
+        return new RouterState(matched, CurrentDepth: 0, merged, query, absoluteUri, path, fragment);
     }
 
-    private string ToRelativePath(string absoluteUri)
+    private string ToRelativePath(string absoluteUri, out string? queryString, out string? fragment)
     {
         var relative = Navigation.ToBaseRelativePath(absoluteUri);
-        // Strip query/fragment — out of scope for v1.
-        var queryIndex = relative.IndexOfAny(['?', '#']);
+
+        // Strip leading slash for consistent split-then-reassemble processing.
+        relative = relative.TrimStart('/');
+
+        fragment = null;
+        var fragmentIndex = relative.IndexOf('#');
+        if (fragmentIndex >= 0)
+        {
+            fragment = relative[(fragmentIndex + 1)..];
+            relative = relative[..fragmentIndex];
+        }
+
+        var queryIndex = relative.IndexOf('?');
         if (queryIndex >= 0)
+        {
+            queryString = relative[(queryIndex + 1)..];
             relative = relative[..queryIndex];
-        return "/" + relative.TrimStart('/');
+        }
+        else
+        {
+            queryString = null;
+        }
+
+        return "/" + relative;
     }
 
     private static IReadOnlyDictionary<string, string> MergeParameters(IReadOnlyList<MatchedRoute> matched)
