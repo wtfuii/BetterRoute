@@ -4,7 +4,8 @@ namespace BetterRoute.Routing.Internal;
 /// Parses a URL query string (<c>key1=value1&key2=value2</c>) into a
 /// read-only dictionary mapping each key to all values for that key.
 /// Bare keys (no <c>=</c>) map to an empty-string value, matching URLSearchParams behavior.
-/// Plus (<c>+</c>) is treated as a literal character (RFC 3986), not a space.
+/// Plus (<c>+</c>) is treated as a literal character (RFC 3986), not decoded as space
+/// (this differs from <c>application/x-www-form-urlencoded</c> and URLSearchParams, which decode <c>+</c> as space).
 /// </summary>
 public static class QueryStringParser
 {

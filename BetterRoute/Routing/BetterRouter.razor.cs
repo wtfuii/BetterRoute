@@ -147,7 +147,7 @@ public partial class BetterRouter : ComponentBase, IDisposable
                     // Restore it with replace:true so we don't create a new history entry.
                     _isRestoring = true;
                     Navigation.NavigateTo(
-                        "/" + fromState.Path.TrimStart('/'),
+                        BuildUrl(fromState),
                         replace: true,
                         forceLoad: false);
                 }
@@ -212,6 +212,21 @@ public partial class BetterRouter : ComponentBase, IDisposable
                 merged[k] = v;
         }
         return merged ?? EmptyParameters;
+    }
+
+    /// <summary>Rebuilds a relative URL from a <see cref="RouterState"/>'s path, query, and fragment.</summary>
+    private static string BuildUrl(RouterState state)
+    {
+        var url = state.Path;
+        if (state.Query.Count > 0)
+        {
+            var pairs = state.Query.SelectMany(kv =>
+                kv.Value.Select(v => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(v)}"));
+            url += "?" + string.Join("&", pairs);
+        }
+        if (state.Fragment is not null)
+            url += "#" + state.Fragment;
+        return url;
     }
 
     private static readonly IReadOnlyDictionary<string, string> EmptyParameters =

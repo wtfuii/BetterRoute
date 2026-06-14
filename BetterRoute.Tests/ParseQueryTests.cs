@@ -169,6 +169,15 @@ public class ParseQueryTests
     }
 
     [Fact]
+    public void Query_keys_are_case_sensitive()
+    {
+        var result = QueryStringParser.Parse("Tab=A&tab=B");
+        Assert.Equal(2, result.Count);
+        Assert.Equal("A", result["Tab"][0]);
+        Assert.Equal("B", result["tab"][0]);
+    }
+
+    [Fact]
     public void RouterState_Fragment_is_accessible()
     {
         var state = new RouterState(
