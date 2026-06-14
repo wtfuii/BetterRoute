@@ -9,6 +9,8 @@
     <a href="users/42/posts/7" @onclick="@(() => Nav.NavigateTo("users/42/posts/7"))" @onclick:preventDefault="true">user 42 post 7</a> ·
     <a href="users/42/search?q=blazor&sort=asc" @onclick="@(() => Nav.NavigateTo("users/42/search?q=blazor&sort=asc"))" @onclick:preventDefault="true">user 42 search</a> ·
     <a href="users/99/profile" @onclick="@(() => Nav.NavigateTo("users/99/profile"))" @onclick:preventDefault="true">user 99 profile</a> ·
+    <a href="profile" @onclick="@(() => Nav.NavigateTo("profile"))" @onclick:preventDefault="true">profile (redirect)</a> ·
+    <a href="home" @onclick="@(() => Nav.NavigateTo("home"))" @onclick:preventDefault="true">home (alias)</a> ·
     <a href="ghost" @onclick="@(() => Nav.NavigateTo("ghost"))" @onclick:preventDefault="true">unknown</a>
 </header>
 
@@ -19,7 +21,8 @@
 @code {
     private static readonly IReadOnlyList<RouteDefinition> Routes =
     [
-        new RouteDefinition("", typeof(Home)),
+        new RouteDefinition("", typeof(Home), Aliases: ["home"]),
+        new RouteDefinition("profile", RedirectTo: "/users/42/profile"),
         new RouteDefinition("users", typeof(UsersLayout), Children:
         [
             new RouteDefinition("", typeof(UsersIndex)),

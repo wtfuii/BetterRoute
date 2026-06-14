@@ -2,23 +2,21 @@ namespace BetterRoute.Routing.Internal;
 
 internal static class RouteMatcher
 {
-    public static bool TryMatch(
+    /// <summary>
+    /// Attempts to match a URL <paramref name="path"/> against a compiled route tree.
+    /// Returns a <see cref="MatchResult"/> that indicates success, a redirect, or not-found.
+    /// </summary>
+    public static MatchResult TryMatch(
         string path,
-        IReadOnlyList<CompiledRoute> tree,
-        out IReadOnlyList<MatchedRoute> matched)
+        IReadOnlyList<CompiledRoute> tree)
     {
         var segments = SplitPath(path);
         var chain = new List<MatchedRoute>();
-        if (MatchLevel(tree, segments, offset: 0, chain))
-        {
-            matched = chain;
-            return true;
-        }
-        matched = [];
-        return false;
+        var result = MatchLevel(tree, segments, offset: 0, chain);
+        return result ?? new MatchResult.NotFound();
     }
 
-    private static bool MatchLevel(
+    private static MatchResult? MatchLevel(
         IReadOnlyList<CompiledRoute> candidates,
         string[] segments,
         int offset,
@@ -38,8 +36,13 @@ internal static class RouteMatcher
 
             if (newOffset == segments.Length)
             {
+                // Check for a redirect on the candidate itself.
+                var redirectResult = CheckRedirect(candidate, chain);
+                if (redirectResult is not null)
+                    return redirectResult;
+
                 if (candidate.Children.Count == 0)
-                    return true;
+                    return new MatchResult.Success(chain.ToList());
 
                 // Allow falling through to an empty-path index child.
                 var indexChild = candidate.Children.FirstOrDefault(c => c.Segments.Count == 0);
@@ -48,22 +51,46 @@ internal static class RouteMatcher
                     chain.Add(new MatchedRoute(
                         indexChild.Definition,
                         EmptyParameters));
-                    return true;
+
+                    // Check for a redirect on the index child.
+                    var idxRedirect = CheckRedirect(indexChild, chain);
+                    if (idxRedirect is not null)
+                        return idxRedirect;
+
+                    return new MatchResult.Success(chain.ToList());
                 }
 
-                return true;
+                return new MatchResult.Success(chain.ToList());
             }
 
-            if (candidate.Children.Count > 0 &&
-                MatchLevel(candidate.Children, segments, newOffset, chain))
+            // Recurse into children; propagate any result (Success, redirect, or null).
+            if (candidate.Children.Count > 0)
             {
-                return true;
+                var childResult = MatchLevel(candidate.Children, segments, newOffset, chain);
+                if (childResult is not null)
+                    return childResult;
             }
 
             chain.RemoveAt(chain.Count - 1);
         }
 
-        return false;
+        return null;
+    }
+
+    /// <summary>
+    /// If <paramref name="route"/> has a <see cref="RouteDefinition.RedirectTo"/> or
+    /// <see cref="RouteDefinition.RedirectToFactory"/>, returns the appropriate
+    /// <see cref="MatchResult"/>. Otherwise returns <c>null</c>.
+    /// </summary>
+    private static MatchResult? CheckRedirect(CompiledRoute route, List<MatchedRoute> chain)
+    {
+        if (route.Definition.RedirectTo is { } redirectTo)
+            return new MatchResult.StaticRedirect(chain.ToList(), redirectTo);
+
+        if (route.Definition.RedirectToFactory is { } factory)
+            return new MatchResult.DynamicRedirect(chain.ToList(), factory);
+
+        return null;
     }
 
     private static bool TryConsume(

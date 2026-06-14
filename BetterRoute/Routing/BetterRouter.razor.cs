@@ -99,22 +99,44 @@ public partial class BetterRouter : ComponentBase, IDisposable
 
         // 1. Resolve match for the target URL.
         var path = ToRelativePath(absoluteUri, out var queryString, out var fragment);
+        var matchResult = RouteMatcher.TryMatch(path, _compiled);
+
         RouterState? toState = null;
 
-        if (RouteMatcher.TryMatch(path, _compiled, out var matched))
+        switch (matchResult)
         {
-            var merged = MergeParameters(matched);
-            var query = QueryStringParser.Parse(queryString);
-            toState = new RouterState(matched, CurrentDepth: 0, merged, query, absoluteUri, path, fragment);
+            case MatchResult.Success success:
+                toState = BuildRouterState(success.Matched, absoluteUri, path, queryString, fragment);
+                break;
+
+            case MatchResult.StaticRedirect redirect:
+                await HandleRedirectAsync(
+                    redirect.RedirectTemplate,
+                    redirect.Matched,
+                    path, queryString, fragment,
+                    ct);
+                return;
+
+            case MatchResult.DynamicRedirect redirect:
+                await HandleRedirectAsync(
+                    null, // template
+                    redirect.Matched,
+                    path, queryString, fragment,
+                    ct,
+                    isDynamic: true,
+                    factory: redirect.Factory);
+                return;
+
+            case MatchResult.NotFound:
+                _state = null;
+                _initialNavigationComplete = true;
+                return;
         }
 
-        // No match — bypass guards and render NotFound.
+        // Should never be null here — Success sets it, all other MatchResult
+        // variants return early. Defensive check for null-safety.
         if (toState is null)
-        {
-            _state = null;
-            _initialNavigationComplete = true;
             return;
-        }
 
         var fromState = _state;
         var leaveGuards = _guardRegistrar.GetLeaveGuards();
@@ -123,7 +145,7 @@ public partial class BetterRouter : ComponentBase, IDisposable
         var pipelineResult = await GuardPipeline.RunAsync(
             fromState,
             toState,
-            matched,
+            toState.Matched,
             leaveGuards,
             BeforeEach,
             OnNavigationError,
@@ -232,9 +254,74 @@ public partial class BetterRouter : ComponentBase, IDisposable
     private static readonly IReadOnlyDictionary<string, string> EmptyParameters =
         new Dictionary<string, string>(StringComparer.Ordinal);
 
+    /// <summary>Builds a <see cref="RouterState"/> from a matched chain and URL parts.</summary>
+    private static RouterState BuildRouterState(
+        IReadOnlyList<MatchedRoute> matched,
+        string absoluteUri,
+        string path,
+        string? queryString,
+        string? fragment)
+    {
+        var merged = MergeParameters(matched);
+        var query = QueryStringParser.Parse(queryString);
+        return new RouterState(matched, CurrentDepth: 0, merged, query, absoluteUri, path, fragment);
+    }
+
+    /// <summary>
+    /// Resolves a redirect target from a matched route and initiates navigation.
+    /// Shares the <see cref="_redirectCount"/> counter with the guard-pipeline redirect path.
+    /// </summary>
+    private async Task HandleRedirectAsync(
+        string? template,
+        IReadOnlyList<MatchedRoute> matched,
+        string currentPath,
+        string? queryString,
+        string? fragment,
+        CancellationToken ct,
+        bool isDynamic = false,
+        Func<RouterState, string?>? factory = null)
+    {
+        string target;
+
+        if (isDynamic)
+        {
+            // Build a provisional RouterState for the factory to inspect.
+            var provisional = BuildRouterState(matched, currentPath, currentPath, queryString, fragment);
+            var factoryResult = factory!(provisional);
+            if (factoryResult is null)
+            {
+                // Factory returned null: no redirect and no component — treat as not-found.
+                _state = null;
+                _initialNavigationComplete = true;
+                return;
+            }
+            target = RedirectTargetResolver.Resolve(
+                factoryResult, MergeParameters(matched), currentPath, queryString, fragment);
+        }
+        else
+        {
+            target = RedirectTargetResolver.Resolve(
+                template!, MergeParameters(matched), currentPath, queryString, fragment);
+        }
+
+        _redirectCount++;
+        if (_redirectCount > 10)
+        {
+            var ex = new InvalidOperationException(
+                "Redirect loop detected: exceeded 10 redirect hops.");
+            OnNavigationError?.Invoke(ex);
+            _initialNavigationComplete = true;
+            return;
+        }
+
+        // replace: true keeps the back-button working naturally —
+        // the user lands on the canonical URL without an extra history entry.
+        Navigation.NavigateTo(target, replace: true, forceLoad: false);
+    }
+
     private RenderFragment RenderRoot(RouterState state) => builder =>
     {
-        builder.OpenComponent(0, state.Current.Definition.Component);
+        builder.OpenComponent(0, state.Current.Definition.Component!);
         builder.CloseComponent();
     };
 

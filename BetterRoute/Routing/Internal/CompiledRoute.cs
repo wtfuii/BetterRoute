@@ -8,22 +8,167 @@ internal sealed class CompiledRoute
     public required IReadOnlyList<CompiledSegment> Segments { get; init; }
     public required IReadOnlyList<CompiledRoute> Children { get; init; }
 
-    public static IReadOnlyList<CompiledRoute> Compile(IReadOnlyList<RouteDefinition> routes)
+    /// <summary>
+    /// Compiles a tree of <see cref="RouteDefinition"/> into <see cref="CompiledRoute"/> nodes.
+    /// Expands aliases into synthetic entries and validates redirect configurations.
+    /// </summary>
+    /// <param name="routes">The route definitions to compile.</param>
+    /// <param name="ancestorParameters">
+    /// Parameter names available from ancestor routes. Internal — callers should omit this.
+    /// </param>
+    public static IReadOnlyList<CompiledRoute> Compile(
+        IReadOnlyList<RouteDefinition> routes,
+        IReadOnlySet<string>? ancestorParameters = null)
     {
         var result = new List<CompiledRoute>(routes.Count);
+        var ancesParams = ancestorParameters ?? new HashSet<string>(StringComparer.Ordinal);
+
         foreach (var route in routes)
         {
+            var ownSegments = ParseSegments(route.Path);
+            var ownParams = GetParameterNames(ownSegments);
+
+            // Validate the route configuration.
+            ValidateRoute(route, ancesParams, ownParams);
+
+            // Build the set of known parameters for children (ancestors + own).
+            var childParams = Union(ancesParams, ownParams);
+
+            // Compile children once — shared by the canonical route and all aliases.
+            var children = route.Children is { Count: > 0 } c
+                ? Compile(c, childParams)
+                : (IReadOnlyList<CompiledRoute>)[];
+
+            // Canonical entry.
             result.Add(new CompiledRoute
             {
                 Definition = route,
-                Segments = ParseSegments(route.Path),
-                Children = route.Children is { Count: > 0 } c ? Compile(c) : [],
+                Segments = ownSegments,
+                Children = children,
             });
+
+            // Synthetic alias entries share the same Definition and Children by reference.
+            if (route.Aliases is { Count: > 0 } aliases)
+            {
+                foreach (var alias in aliases)
+                {
+                    result.Add(new CompiledRoute
+                    {
+                        Definition = route,
+                        Segments = ParseSegments(alias),
+                        Children = children,
+                    });
+                }
+            }
         }
+
         return result;
     }
 
-    private static IReadOnlyList<CompiledSegment> ParseSegments(string path)
+    private static void ValidateRoute(
+        RouteDefinition route,
+        IReadOnlySet<string> ancestorParameters,
+        HashSet<string> ownParams)
+    {
+        var hasRedirectTo = route.RedirectTo is not null;
+        var hasRedirectFactory = route.RedirectToFactory is not null;
+        var hasComponent = route.Component is not null;
+        var hasChildren = route.Children is { Count: > 0 };
+        var hasAliases = route.Aliases is { Count: > 0 };
+
+        // RedirectTo and RedirectToFactory are mutually exclusive.
+        if (hasRedirectTo && hasRedirectFactory)
+            throw new InvalidOperationException(
+                $"Route \"{route.Path}\" cannot have both RedirectTo and RedirectToFactory.");
+
+        // A redirect and an alias together is nonsensical.
+        if ((hasRedirectTo || hasRedirectFactory) && hasAliases)
+            throw new InvalidOperationException(
+                $"Route \"{route.Path}\" cannot have both a redirect and aliases.");
+
+        // A redirect must not also specify a Component.
+        if ((hasRedirectTo || hasRedirectFactory) && hasComponent)
+            throw new InvalidOperationException(
+                $"Route \"{route.Path}\" cannot have both a redirect and a Component.");
+
+        // Every route must have a Component, a redirect, or children.
+        if (!hasComponent && !hasRedirectTo && !hasRedirectFactory && !hasChildren)
+            throw new InvalidOperationException(
+                $"Route \"{route.Path}\" must have a Component, a redirect, or children.");
+
+        // Validate that all :param references in the redirect template are bound.
+        if (hasRedirectTo)
+        {
+            ValidateRedirectParams(route.Path, route.RedirectTo!, ancestorParameters, ownParams);
+        }
+    }
+
+    private static void ValidateRedirectParams(
+        string routePath,
+        string template,
+        IReadOnlySet<string> ancestorParams,
+        HashSet<string> ownParams)
+    {
+        var knownParams = new HashSet<string>(ancestorParams, StringComparer.Ordinal);
+        foreach (var p in ownParams)
+            knownParams.Add(p);
+
+        foreach (var paramName in ParseRedirectParamRefs(template))
+        {
+            if (!knownParams.Contains(paramName))
+                throw new InvalidOperationException(
+                    $"Redirect template \"{template}\" on route \"{routePath}\" references " +
+                    $"parameter \":{paramName}\" which is not available in this route or its ancestors.");
+        }
+    }
+
+    /// <summary>Extracts the set of parameter names from compiled segments.</summary>
+    private static HashSet<string> GetParameterNames(IReadOnlyList<CompiledSegment> segments)
+    {
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var seg in segments)
+        {
+            if (seg.IsParameter)
+                names.Add(seg.Value);
+        }
+        return names;
+    }
+
+    /// <summary>
+    /// Yields <c>:paramName</c> references found in a redirect template string.
+    /// Only recognises identifiers that start with a letter or underscore and
+    /// contain letters, digits, or underscores.
+    /// </summary>
+    private static IEnumerable<string> ParseRedirectParamRefs(string template)
+    {
+        for (var i = 0; i < template.Length; i++)
+        {
+            if (template[i] == ':' && i + 1 < template.Length && IsParamStartChar(template[i + 1]))
+            {
+                var j = i + 1;
+                while (j < template.Length && IsParamChar(template[j]))
+                    j++;
+                yield return template[(i + 1)..j];
+                i = j - 1;
+            }
+        }
+    }
+
+    private static bool IsParamStartChar(char c) => char.IsLetter(c) || c == '_';
+    private static bool IsParamChar(char c) => char.IsLetterOrDigit(c) || c == '_';
+
+    private static HashSet<string> Union(IReadOnlySet<string>? a, HashSet<string> b)
+    {
+        if (a is null || a.Count == 0)
+            return new HashSet<string>(b, StringComparer.Ordinal);
+
+        var result = new HashSet<string>(a, StringComparer.Ordinal);
+        foreach (var item in b)
+            result.Add(item);
+        return result;
+    }
+
+    internal static IReadOnlyList<CompiledSegment> ParseSegments(string path)
     {
         if (string.IsNullOrEmpty(path))
             return [];
