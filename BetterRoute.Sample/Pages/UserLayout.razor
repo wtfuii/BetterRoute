@@ -3,14 +3,14 @@
 }
 
 <div style="border: 2px dashed #2a8c4a; padding: 12px; border-radius: 6px; margin-top: 8px;">
-    <h2 style="margin-top: 0;">User @State.Parameters["userId"]</h2>
+    <h2 style="margin-top: 0;">User @State.GetParameter("userId")</h2>
     <p style="color: #555;">Inner layout for one user. The <code>userId</code> parameter is visible here and to deeper levels.</p>
     <nav style="margin-bottom: 8px;">
-        <a href="users/@State.Parameters["userId"]">overview</a> ·
-        <a href="users/@State.Parameters["userId"]/profile">profile</a> ·
-        <a href="users/@State.Parameters["userId"]/search?q=blazor&sort=asc">search</a> ·
-        <a href="users/@State.Parameters["userId"]/posts/1">post 1</a> ·
-        <a href="users/@State.Parameters["userId"]/posts/2">post 2</a>
+        <a href="users/@State.GetParameter("userId")">overview</a> ·
+        <a href="users/@State.GetParameter("userId")/profile">profile</a> ·
+        <a href="users/@State.GetParameter("userId")/search?q=blazor&sort=asc">search</a> ·
+        <a href="users/@State.GetParameter("userId")/posts/1">post 1</a> ·
+        <a href="users/@State.GetParameter("userId")/posts/2">post 2</a>
     </nav>
     <div style="display: flex; gap: 16px;">
         <div style="flex: 1; min-width: 0;">

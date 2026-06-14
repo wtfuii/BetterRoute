@@ -7,7 +7,7 @@
     private string? Page => State.GetQuery("page");
 }
 
-<h3>Search for user @State.Parameters["userId"]</h3>
+<h3>Search for user @State.GetParameter("userId")</h3>
 
 <div style="background: #f0f4ff; border: 1px solid #88a; padding: 12px; border-radius: 6px; margin: 12px 0;">
     <h4 style="margin-top: 0;">Query String Demo</h4>
@@ -81,10 +81,10 @@
 <div style="margin-top: 16px;">
     <p><strong>Demo links:</strong></p>
     <nav>
-        <a href="users/@State.Parameters["userId"]/search?q=blazor&sort=asc">?q=blazor&sort=asc</a> ·
-        <a href="users/@State.Parameters["userId"]/search?q=routing&tag=oss&tag=csharp">?q=routing&tag=oss&tag=csharp</a> ·
-        <a href="users/@State.Parameters["userId"]/search?bare">?bare (bare key)</a> ·
-        <a href="users/@State.Parameters["userId"]/search?page=2#results">?page=2#results</a> ·
-        <a href="users/@State.Parameters["userId"]/search">no params</a>
+        <a href="users/@State.GetParameter("userId")/search?q=blazor&sort=asc">?q=blazor&sort=asc</a> ·
+        <a href="users/@State.GetParameter("userId")/search?q=routing&tag=oss&tag=csharp">?q=routing&tag=oss&tag=csharp</a> ·
+        <a href="users/@State.GetParameter("userId")/search?bare">?bare (bare key)</a> ·
+        <a href="users/@State.GetParameter("userId")/search?page=2#results">?page=2#results</a> ·
+        <a href="users/@State.GetParameter("userId")/search">no params</a>
     </nav>
 </div>

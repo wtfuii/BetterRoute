@@ -28,6 +28,7 @@ public partial class BetterRouter : ComponentBase, IDisposable
 
     private IReadOnlyList<CompiledRoute> _compiled = [];
     private IReadOnlyList<RouteDefinition>? _lastRoutesRef;
+    private NamedRouteIndex _namedRouteIndex = NamedRouteIndex.Empty;
     private RouterState? _state;
     private bool _initialNavigationComplete;
     private bool _isRestoring;
@@ -45,7 +46,7 @@ public partial class BetterRouter : ComponentBase, IDisposable
     {
         if (!ReferenceEquals(_lastRoutesRef, Routes))
         {
-            _compiled = CompiledRoute.Compile(Routes);
+            _compiled = CompiledRoute.Compile(Routes, out _namedRouteIndex);
             _lastRoutesRef = Routes;
         }
 
@@ -255,7 +256,7 @@ public partial class BetterRouter : ComponentBase, IDisposable
         new Dictionary<string, string>(StringComparer.Ordinal);
 
     /// <summary>Builds a <see cref="RouterState"/> from a matched chain and URL parts.</summary>
-    private static RouterState BuildRouterState(
+    private RouterState BuildRouterState(
         IReadOnlyList<MatchedRoute> matched,
         string absoluteUri,
         string path,
@@ -264,7 +265,12 @@ public partial class BetterRouter : ComponentBase, IDisposable
     {
         var merged = MergeParameters(matched);
         var query = QueryStringParser.Parse(queryString);
-        return new RouterState(matched, CurrentDepth: 0, merged, query, absoluteUri, path, fragment);
+        return new RouterState(matched, CurrentDepth: 0, merged, query, absoluteUri, path, fragment)
+        {
+            NamedRoutes = _namedRouteIndex,
+            NavigateCallback = (url, replace) =>
+                Navigation.NavigateTo(url, forceLoad: false, replace: replace),
+        };
     }
 
     /// <summary>

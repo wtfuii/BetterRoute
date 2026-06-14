@@ -24,7 +24,7 @@
     [
         new RouteDefinition("", typeof(Home), Aliases: ["home"]),
         new RouteDefinition("profile", RedirectTo: "/users/42/profile"),
-        new RouteDefinition("users", typeof(UsersLayout), Children:
+        new RouteDefinition("users", typeof(UsersLayout), Name: "users", Children:
         [
             new RouteDefinition("", typeof(UsersIndex)),
             new RouteDefinition(":userId", typeof(UserLayout), Children:
@@ -37,6 +37,7 @@
                         ["sidebar"] = typeof(UserSidebar),
                     }),
                 new RouteDefinition("posts/:postId", typeof(UserPost),
+                    Name: "user.post",
                     Components: new Dictionary<string, Type>
                     {
                         ["sidebar"] = typeof(UserSidebar),

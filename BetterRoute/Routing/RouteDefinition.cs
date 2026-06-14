@@ -12,7 +12,12 @@ namespace BetterRoute.Routing;
 /// <param name="Component">The component type rendered when this route matches. Set to <c>null</c>
 /// when <paramref name="RedirectTo"/> or <paramref name="RedirectToFactory"/> is used instead.</param>
 /// <param name="Children">Optional nested routes, matched against the remaining URL after this node consumes its segments.</param>
-/// <param name="Name">Optional name for the route. Reserved for future named-route resolution.</param>
+/// <param name="Name">
+/// Optional name for this route, used with <see cref="RouterState.ResolveUrl"/> and
+/// <see cref="RouterState.NavigateTo(string,System.Collections.Generic.IReadOnlyDictionary{string,string}?,bool)"/>
+/// for programmatic URL resolution and navigation. Names must be unique across the entire route tree.
+/// Use dots as separators (e.g. <c>"user.post"</c>).
+/// </param>
 /// <param name="Components">
 /// Optional named components keyed by outlet name. The default outlet renders
 /// <see cref="Component"/>; named outlets render components from this dictionary.

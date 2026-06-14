@@ -20,6 +20,31 @@ internal sealed class CompiledRoute
         IReadOnlyList<RouteDefinition> routes,
         IReadOnlySet<string>? ancestorParameters = null)
     {
+        return Compile(routes, ancestorParameters, nameIndex: null, ancestorPath: null);
+    }
+
+    /// <summary>
+    /// Compiles a tree of <see cref="RouteDefinition"/> into <see cref="CompiledRoute"/> nodes
+    /// and populates <paramref name="index"/> with any named routes found in the tree.
+    /// </summary>
+    internal static IReadOnlyList<CompiledRoute> Compile(
+        IReadOnlyList<RouteDefinition> routes,
+        out NamedRouteIndex index)
+    {
+        var dict = new Dictionary<string, NamedRouteEntry>(StringComparer.Ordinal);
+        var compiled = Compile(routes, ancestorParameters: null, dict, ancestorPath: null);
+        index = dict.Count > 0
+            ? new NamedRouteIndex(dict)
+            : NamedRouteIndex.Empty;
+        return compiled;
+    }
+
+    private static IReadOnlyList<CompiledRoute> Compile(
+        IReadOnlyList<RouteDefinition> routes,
+        IReadOnlySet<string>? ancestorParameters,
+        Dictionary<string, NamedRouteEntry>? nameIndex,
+        string? ancestorPath)
+    {
         var result = new List<CompiledRoute>(routes.Count);
         var ancesParams = ancestorParameters ?? new HashSet<string>(StringComparer.Ordinal);
 
@@ -34,10 +59,28 @@ internal sealed class CompiledRoute
             // Build the set of known parameters for children (ancestors + own).
             var childParams = Union(ancesParams, ownParams);
 
+            // Compute the full path for this route's children
+            // and for name indexing of this route itself.
+            var childAncestorPath = BuildFullPath(ancestorPath, route.Path);
+
             // Compile children once — shared by the canonical route and all aliases.
             var children = route.Children is { Count: > 0 } c
-                ? Compile(c, childParams)
+                ? Compile(c, childParams, nameIndex, childAncestorPath)
                 : (IReadOnlyList<CompiledRoute>)[];
+
+            // Register name if present — only on the canonical entry, not aliases.
+            if (route.Name is not null && nameIndex is not null)
+            {
+                var fullPath = childAncestorPath ?? "";
+                if (!nameIndex.TryAdd(route.Name, new NamedRouteEntry(fullPath, route)))
+                {
+                    var existing = nameIndex[route.Name];
+                    throw new InvalidOperationException(
+                        $"Route name \"{route.Name}\" is already in use by " +
+                        $"\"{existing.FullPathTemplate}\". " +
+                        $"Duplicate declared at \"{fullPath}\".");
+                }
+            }
 
             // Canonical entry.
             result.Add(new CompiledRoute
@@ -63,6 +106,21 @@ internal sealed class CompiledRoute
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Builds the full path for a child route by concatenating the ancestor path
+    /// with this route's own path segments.
+    /// </summary>
+    private static string? BuildFullPath(string? ancestorPath, string ownPath)
+    {
+        if (string.IsNullOrEmpty(ownPath))
+            return ancestorPath;
+
+        if (ancestorPath is null)
+            return ownPath;
+
+        return ancestorPath + "/" + ownPath;
     }
 
     private static void ValidateRoute(

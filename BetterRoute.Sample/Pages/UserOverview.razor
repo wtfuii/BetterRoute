@@ -4,3 +4,15 @@
 
 <h3>Overview for user @State.Parameters["userId"]</h3>
 <p>Index page for one user. Pick profile or a post from the nav.</p>
+
+<h4>Named-route demo</h4>
+<p>
+    Resolved via <code>State.ResolveUrl</code>:
+    <code>@State.ResolveUrl("user.post", new Dictionary<string, string> { ["userId"] = State.Parameters["userId"], ["postId"] = "7" })</code>
+</p>
+<p>
+    <a href="" @onclick="@(() => State.NavigateTo("user.post", new { userId = State.Parameters["userId"], postId = "7" }))"
+       @onclick:preventDefault="true">
+        Navigate to post 7 (via State.NavigateTo)
+    </a>
+</p>
