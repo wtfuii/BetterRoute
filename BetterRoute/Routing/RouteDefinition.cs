@@ -16,4 +16,13 @@ public sealed record RouteDefinition(
     string Path,
     Type Component,
     IReadOnlyList<RouteDefinition>? Children = null,
-    string? Name = null);
+    string? Name = null)
+{
+    /// <summary>
+    /// Optional per-route guard executed before entering this route.
+    /// Runs only for route nodes that are new to the matched chain
+    /// (i.e., not reused from the previous navigation by reference
+    /// equality of the <c>RouteDefinition</c> instance).
+    /// </summary>
+    public NavigationGuard? BeforeEnter { get; init; }
+}

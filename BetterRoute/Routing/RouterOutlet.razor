@@ -3,6 +3,8 @@
 @if (HasChild)
 {
     <CascadingValue Value="ChildState" IsFixed="false">
-        <DynamicComponent Type="ChildComponent" />
+        <CascadingValue Value="@GuardRegistrar" IsFixed="true">
+            <DynamicComponent Type="ChildComponent" />
+        </CascadingValue>
     </CascadingValue>
 }

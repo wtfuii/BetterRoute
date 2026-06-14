@@ -4,10 +4,12 @@
 @if (_state is not null)
 {
     <CascadingValue Value="_state" IsFixed="false">
-        @RenderRoot(_state)
+        <CascadingValue Value="_guardRegistrar" IsFixed="true">
+            @RenderRoot(_state)
+        </CascadingValue>
     </CascadingValue>
 }
-else if (NotFound is not null)
+else if (_initialNavigationComplete && NotFound is not null)
 {
     <DynamicComponent Type="NotFound" />
 }
