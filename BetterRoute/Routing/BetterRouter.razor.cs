@@ -9,9 +9,18 @@ public partial class BetterRouter : ComponentBase, IDisposable
 {
     [Inject] private NavigationManager Navigation { get; set; } = default!;
 
+    /// <summary>
+    /// The root route definitions. Build these as a tree of
+    /// <see cref="RouteDefinition"/> records with nested <see cref="RouteDefinition.Children"/>.
+    /// Compiled into an internal match tree on first render and whenever the reference changes.
+    /// </summary>
     [Parameter, EditorRequired]
     public IReadOnlyList<RouteDefinition> Routes { get; set; } = [];
 
+    /// <summary>
+    /// Optional component type to render when no route matches the current URL.
+    /// When <c>null</c>, unmatched URLs produce no output.
+    /// </summary>
     [Parameter] public Type? NotFound { get; set; }
 
     /// <summary>
@@ -335,6 +344,9 @@ public partial class BetterRouter : ComponentBase, IDisposable
         builder.CloseComponent();
     };
 
+    /// <summary>
+    /// Unsubscribes from navigation events and cancels any in-flight navigation.
+    /// </summary>
     public void Dispose()
     {
         Navigation.LocationChanged -= OnLocationChanged;

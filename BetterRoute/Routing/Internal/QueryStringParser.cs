@@ -9,6 +9,14 @@ namespace BetterRoute.Routing.Internal;
 /// </summary>
 public static class QueryStringParser
 {
+    /// <summary>
+    /// Parses a URL query string into a read-only dictionary.
+    /// </summary>
+    /// <param name="queryString">The raw query string (without leading <c>?</c>), or <c>null</c>.</param>
+    /// <returns>
+    /// A dictionary mapping each key to all values for that key.
+    /// Returns an empty dictionary for <c>null</c> or empty input.
+    /// </returns>
     public static IReadOnlyDictionary<string, IReadOnlyList<string>> Parse(string? queryString)
     {
         if (string.IsNullOrEmpty(queryString))

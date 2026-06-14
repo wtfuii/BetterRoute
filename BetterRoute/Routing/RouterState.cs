@@ -8,6 +8,28 @@ namespace BetterRoute.Routing;
 /// Cascaded state available to every component in the matched route chain.
 /// Grab it via <c>[CascadingParameter] public RouterState State { get; set; } = default!;</c>.
 /// </summary>
+/// <param name="Matched">
+/// The full matched route chain, from the root to the deepest matching leaf.
+/// <see cref="Current"/> returns the entry at <see cref="CurrentDepth"/>.
+/// </param>
+/// <param name="CurrentDepth">
+/// Zero-based index into <paramref name="Matched"/> indicating which route level
+/// is currently being rendered. Advanced by <see cref="RouterOutlet"/> as rendering
+/// descends into nested routes.
+/// </param>
+/// <param name="Parameters">
+/// All path parameters merged across the entire matched chain. Later (deeper) routes
+/// override parameters with the same name from earlier (shallower) routes.
+/// Use <see cref="GetParameter"/> for convenient single-value access.
+/// </param>
+/// <param name="Query">
+/// Parsed query-string values. Each key maps to all values for that key
+/// (e.g. <c>?a=1&amp;a=2</c> produces <c>{"a": ["1","2"]}</c>).
+/// Use <see cref="GetQuery"/> or <see cref="GetQueryValues"/> for access.
+/// </param>
+/// <param name="Url">The full absolute URL of the current navigation (including origin and query string).</param>
+/// <param name="Path">The relative path portion of the URL (without query string or fragment).</param>
+/// <param name="Fragment">The fragment portion of the URL after <c>#</c>, or <c>null</c> if none.</param>
 public sealed record RouterState(
     IReadOnlyList<MatchedRoute> Matched,
     int CurrentDepth,
@@ -23,7 +45,13 @@ public sealed record RouterState(
     /// </summary>
     internal NamedRouteIndex NamedRoutes { get; init; } = NamedRouteIndex.Empty;
 
-    /// <summary>The matched route at <see cref="CurrentDepth"/>.</summary>
+    /// <summary>
+    /// The matched route entry for the current nesting depth.
+    /// This is the route whose component is actively rendered at this level
+    /// of the route tree. When rendering descends via <see cref="RouterOutlet"/>,
+    /// the outlet advances <see cref="CurrentDepth"/> so nested components see
+    /// their own route entry here.
+    /// </summary>
     public MatchedRoute Current => Matched[CurrentDepth];
 
     /// <summary>Returns the value for <paramref name="key"/>, or null if not present.</summary>

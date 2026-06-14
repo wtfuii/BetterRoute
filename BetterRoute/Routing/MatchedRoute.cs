@@ -6,6 +6,11 @@ namespace BetterRoute.Routing;
 /// One level of a successful match: the route node that matched and the parameters
 /// its own segments captured (excluding parameters captured by ancestors).
 /// </summary>
+/// <param name="Definition">The <see cref="RouteDefinition"/> that matched at this tree depth.</param>
+/// <param name="SegmentParameters">
+/// Parameters captured from this route node's own <c>:param</c> segments.
+/// Does not include parameters captured by ancestor or descendant routes.
+/// </param>
 public sealed record MatchedRoute(
     RouteDefinition Definition,
     IReadOnlyDictionary<string, string> SegmentParameters)

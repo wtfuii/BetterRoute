@@ -12,8 +12,19 @@ public partial class RouterOutlet : ComponentBase
     /// </summary>
     [Parameter] public string? Name { get; set; }
 
+    /// <summary>
+    /// The current router state, cascaded by <see cref="BetterRouter"/>.
+    /// Provides access to the matched route chain, parameters, query string,
+    /// and navigation helpers at the current depth.
+    /// </summary>
     [CascadingParameter] public RouterState? State { get; set; }
 
+    /// <summary>
+    /// The guard registrar, cascaded by <see cref="BetterRouter"/>.
+    /// Components deeper in the tree register leave-guard delegates here
+    /// via <see cref="GuardRegistrar.Register"/> to intercept navigation
+    /// away from the current route.
+    /// </summary>
     [CascadingParameter] public GuardRegistrar? GuardRegistrar { get; set; }
 
     private bool HasChild
