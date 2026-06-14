@@ -16,9 +16,14 @@
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   </a>
+  <a href="https://wtfuii.github.io/BetterRoute">
+    <img src="https://img.shields.io/badge/demo-live-0b9642" alt="Live Demo">
+  </a>
 </p>
 
 BetterRoute is an alternative to Blazor's built-in `Router` that replaces flat route tables with a **declarative tree of `RouteDefinition` records**. Routes are defined as nested nodes — mirroring the component hierarchy they render — which unlocks parent/child relationships, cascading state, named outlets, redirects, aliases, navigation guards, and programmatic navigation by route name.
+
+> 🚀 **[See the live demo →](https://wtfuii.github.io/BetterRoute)** — a Blazor WASM app built with BetterRoute, deployed to GitHub Pages. [Browse the source →](BetterRoute.Sample)
 
 ---
 
