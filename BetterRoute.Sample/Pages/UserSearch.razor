@@ -1,0 +1,90 @@
+@code {
+    [CascadingParameter] public RouterState State { get; set; } = default!;
+
+    private string? SearchTerm => State.GetQuery("q");
+    private IReadOnlyList<string> Tags => State.GetQueryValues("tag");
+    private string? Sort => State.GetQuery("sort");
+    private string? Page => State.GetQuery("page");
+}
+
+<h3>Search for user @State.Parameters["userId"]</h3>
+
+<div style="background: #f0f4ff; border: 1px solid #88a; padding: 12px; border-radius: 6px; margin: 12px 0;">
+    <h4 style="margin-top: 0;">Query String Demo</h4>
+
+    @if (string.IsNullOrEmpty(SearchTerm))
+    {
+        <p style="color: #888;">No search term provided — try adding <code>?q=hello</code> to the URL.</p>
+    }
+    else
+    {
+        <p><strong>Search term:</strong> <code>@SearchTerm</code></p>
+    }
+
+    @if (Tags.Count > 0)
+    {
+        <p>
+            <strong>Tags (@Tags.Count):</strong>
+            @foreach (var tag in Tags)
+            {
+                <span style="background: #dde; padding: 2px 6px; border-radius: 3px; margin: 0 2px;">@tag</span>
+            }
+        </p>
+    }
+    else
+    {
+        <p style="color: #888;">No tags — try adding <code>?tag=a&tag=b</code> for multi-valued params.</p>
+    }
+
+    @if (Sort is not null)
+    {
+        <p><strong>Sort:</strong> <code>@Sort</code></p>
+    }
+
+    @if (Page is not null)
+    {
+        <p><strong>Page:</strong> <code>@Page</code></p>
+    }
+
+    <h4 style="margin-top: 16px;">Raw Query Dictionary</h4>
+    @if (State.Query.Count == 0)
+    {
+        <p style="color: #888;">No query parameters.</p>
+    }
+    else
+    {
+        <table style="border-collapse: collapse; width: 100%;">
+            <tr style="background: #e0e4f0;"><th style="text-align: left; padding: 4px 8px;">Key</th><th style="text-align: left; padding: 4px 8px;">Values</th></tr>
+            @foreach (var kv in State.Query)
+            {
+                <tr style="border-top: 1px solid #ccc;">
+                    <td style="padding: 4px 8px;"><code>@kv.Key</code></td>
+                    <td style="padding: 4px 8px;"><code>@string.Join(", ", kv.Value)</code></td>
+                </tr>
+            }
+        </table>
+    }
+</div>
+
+<div style="background: #fff4e6; border: 1px solid #c90; padding: 12px; border-radius: 6px; margin: 12px 0;">
+    <h4 style="margin-top: 0;">Fragment Demo</h4>
+    @if (State.Fragment is null)
+    {
+        <p style="color: #888;">No fragment — try adding <code>#section-intro</code> to the URL.</p>
+    }
+    else
+    {
+        <p><strong>Fragment:</strong> <code>@State.Fragment</code></p>
+    }
+</div>
+
+<div style="margin-top: 16px;">
+    <p><strong>Demo links:</strong></p>
+    <nav>
+        <a href="users/@State.Parameters["userId"]/search?q=blazor&sort=asc">?q=blazor&sort=asc</a> ·
+        <a href="users/@State.Parameters["userId"]/search?q=routing&tag=oss&tag=csharp">?q=routing&tag=oss&tag=csharp</a> ·
+        <a href="users/@State.Parameters["userId"]/search?bare">?bare (bare key)</a> ·
+        <a href="users/@State.Parameters["userId"]/search?page=2#results">?page=2#results</a> ·
+        <a href="users/@State.Parameters["userId"]/search">no params</a>
+    </nav>
+</div>
