@@ -316,7 +316,11 @@ public partial class BetterRouter : ComponentBase, IDisposable
 
         // replace: true keeps the back-button working naturally —
         // the user lands on the canonical URL without an extra history entry.
-        Navigation.NavigateTo(target, replace: true, forceLoad: false);
+        // Trim the leading '/' so NavigateTo resolves the path relative to the
+        // app's base URI rather than the origin root. This keeps redirects
+        // working when the app is deployed under a non-root base path,
+        // e.g. GitHub Pages at /BetterRoute/.
+        Navigation.NavigateTo(target.TrimStart('/'), replace: true, forceLoad: false);
     }
 
     private RenderFragment RenderRoot(RouterState state) => builder =>
