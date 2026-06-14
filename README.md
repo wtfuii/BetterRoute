@@ -1,7 +1,7 @@
 # BetterRoute
 
 <p align="center">
-  <b>A tree-based client-side routing library for Blazor WebAssembly</b>
+  <b>A tree-based routing library for Blazor — works with WASM, Server, and Web App (Auto / InteractiveServer / InteractiveWebAssembly)</b>
 </p>
 
 <p align="center">
@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/nuget/v/BetterRoute.svg?label=NuGet" alt="NuGet">
   </a>
   <img src="https://img.shields.io/badge/net-10.0-blueviolet" alt=".NET 10.0">
-  <img src="https://img.shields.io/badge/Blazor-WASM-512bd4" alt="Blazor WASM">
+  <img src="https://img.shields.io/badge/Blazor-WASM_|_Server_|_Web_App-512bd4" alt="Blazor WASM | Server | Web App">
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   </a>
