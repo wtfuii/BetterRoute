@@ -1,0 +1,7 @@
+@code {
+    [CascadingParameter] public RouterState State { get; set; } = default!;
+}
+
+<h3>Stats for User @State.Parameters["userId"]</h3>
+<p>This route has a named <code>"sidebar"</code> outlet alongside the default content — see the right column.</p>
+<p><em>The sidebar is rendered via <c>&lt;RouterOutlet Name="sidebar" /&gt;</c> in UserLayout.</em></p>

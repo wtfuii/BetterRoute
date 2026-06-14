@@ -73,6 +73,7 @@ internal sealed class CompiledRoute
         var hasRedirectTo = route.RedirectTo is not null;
         var hasRedirectFactory = route.RedirectToFactory is not null;
         var hasComponent = route.Component is not null;
+        var hasNamedComponents = route.Components is { Count: > 0 };
         var hasChildren = route.Children is { Count: > 0 };
         var hasAliases = route.Aliases is { Count: > 0 };
 
@@ -91,10 +92,10 @@ internal sealed class CompiledRoute
             throw new InvalidOperationException(
                 $"Route \"{route.Path}\" cannot have both a redirect and a Component.");
 
-        // Every route must have a Component, a redirect, or children.
-        if (!hasComponent && !hasRedirectTo && !hasRedirectFactory && !hasChildren)
+        // Every route must have a Component, a named component, a redirect, or children.
+        if (!hasComponent && !hasNamedComponents && !hasRedirectTo && !hasRedirectFactory && !hasChildren)
             throw new InvalidOperationException(
-                $"Route \"{route.Path}\" must have a Component, a redirect, or children.");
+                $"Route \"{route.Path}\" must have a Component, a named component, a redirect, or children.");
 
         // Validate that all :param references in the redirect template are bound.
         if (hasRedirectTo)

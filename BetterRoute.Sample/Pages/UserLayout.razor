@@ -12,5 +12,12 @@
         <a href="users/@State.Parameters["userId"]/posts/1">post 1</a> ·
         <a href="users/@State.Parameters["userId"]/posts/2">post 2</a>
     </nav>
-    <RouterOutlet />
+    <div style="display: flex; gap: 16px;">
+        <div style="flex: 1; min-width: 0;">
+            <RouterOutlet />
+        </div>
+        <aside style="width: 220px; flex-shrink: 0;">
+            <RouterOutlet Name="sidebar" />
+        </aside>
+    </div>
 </div>

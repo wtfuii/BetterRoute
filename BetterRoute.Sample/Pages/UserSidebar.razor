@@ -1,0 +1,17 @@
+@code {
+    [CascadingParameter] public RouterState State { get; set; } = default!;
+    [Parameter] public string? Title { get; set; }
+}
+
+<div style="background: #e8f4fd; padding: 10px; border-radius: 4px; border: 1px solid #b3d9f2;">
+    <strong>@(Title ?? "Sidebar")</strong>
+    @if (State is not null)
+    {
+        <p style="margin: 4px 0; font-size: 0.9em;">
+            User: @State.Parameters.GetValueOrDefault("userId", "?")
+        </p>
+    }
+    <p style="margin: 4px 0; font-size: 0.85em; color: #555;">
+        Rendered from a named outlet at the same depth as the layout.
+    </p>
+</div>

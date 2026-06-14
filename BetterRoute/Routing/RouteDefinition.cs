@@ -13,6 +13,12 @@ namespace BetterRoute.Routing;
 /// when <paramref name="RedirectTo"/> or <paramref name="RedirectToFactory"/> is used instead.</param>
 /// <param name="Children">Optional nested routes, matched against the remaining URL after this node consumes its segments.</param>
 /// <param name="Name">Optional name for the route. Reserved for future named-route resolution.</param>
+/// <param name="Components">
+/// Optional named components keyed by outlet name. The default outlet renders
+/// <see cref="Component"/>; named outlets render components from this dictionary.
+/// Use with <c>&lt;RouterOutlet Name="..."/&gt;</c> to populate multiple regions
+/// (e.g. sidebar, modal) from a single route node.
+/// </param>
 /// <param name="RedirectTo">
 /// Optional static redirect target. When this route matches, the browser is redirected
 /// to this URL. May contain <c>:param</c> placeholders that are substituted with captured
@@ -32,6 +38,7 @@ public sealed record RouteDefinition(
     Type? Component = null,
     IReadOnlyList<RouteDefinition>? Children = null,
     string? Name = null,
+    IReadOnlyDictionary<string, Type>? Components = null,
     string? RedirectTo = null,
     Func<RouterState, string?>? RedirectToFactory = null,
     IReadOnlyList<string>? Aliases = null)

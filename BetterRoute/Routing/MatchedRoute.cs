@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace BetterRoute.Routing;
 
 /// <summary>
@@ -6,4 +8,36 @@ namespace BetterRoute.Routing;
 /// </summary>
 public sealed record MatchedRoute(
     RouteDefinition Definition,
-    IReadOnlyDictionary<string, string> SegmentParameters);
+    IReadOnlyDictionary<string, string> SegmentParameters)
+{
+    private IReadOnlyDictionary<string, Type>? _allComponents;
+
+    /// <summary>
+    /// All components available at this matched level, keyed by outlet name.
+    /// The default outlet component is keyed under <c>""</c> (empty string).
+    /// Named outlets from <see cref="RouteDefinition.Components"/> are keyed
+    /// by their name. Returns an empty dictionary when no components are defined.
+    /// </summary>
+    public IReadOnlyDictionary<string, Type> AllComponents
+    {
+        get
+        {
+            if (_allComponents is not null)
+                return _allComponents;
+
+            var dict = new Dictionary<string, Type>(StringComparer.Ordinal);
+
+            if (Definition.Component is not null)
+                dict[""] = Definition.Component;
+
+            if (Definition.Components is { Count: > 0 } components)
+            {
+                foreach (var (key, value) in components)
+                    dict[key] = value;
+            }
+
+            _allComponents = new ReadOnlyDictionary<string, Type>(dict);
+            return _allComponents;
+        }
+    }
+}
