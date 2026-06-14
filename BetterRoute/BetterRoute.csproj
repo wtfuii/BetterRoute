@@ -4,15 +4,53 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-    </PropertyGroup>
 
+        <!-- NuGet package metadata -->
+        <PackageId>BetterRoute</PackageId>
+        <Version>1.0.0</Version>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+        <Authors>Klaus Deja</Authors>
+        <Description>
+            A tree-based routing library for Blazor — an alternative to the built-in Router that
+            replaces flat route tables with a declarative tree of RouteDefinition records. Supports
+            parent/child relationships, cascading state, named outlets, redirects, aliases,
+            navigation guards, and programmatic navigation by route name.
+        </Description>
+        <PackageTags>blazor;routing;wasm;server;spa;router;navigation;tree</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageProjectUrl>https://github.com/wtfuii/BetterRoute</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/wtfuii/BetterRoute</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+
+        <!-- Generate XML docs for IntelliSense -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+        <!-- Source Link: enables debugger to fetch sources from GitHub -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+        <!-- Symbol package (snupkg) for debugging -->
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <!-- Deterministic builds for CI -->
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.2"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup>
         <InternalsVisibleTo Include="BetterRoute.Tests"/>
+    </ItemGroup>
+
+    <!-- Include README.md in the NuGet package -->
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
 </Project>
