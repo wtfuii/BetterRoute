@@ -1,0 +1,13 @@
+@namespace BetterRoute.Routing
+@implements IDisposable
+
+@if (_state is not null)
+{
+    <CascadingValue Value="_state" IsFixed="false">
+        @RenderRoot(_state)
+    </CascadingValue>
+}
+else if (NotFound is not null)
+{
+    <DynamicComponent Type="NotFound" />
+}

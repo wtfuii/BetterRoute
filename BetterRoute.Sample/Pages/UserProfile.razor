@@ -1,0 +1,6 @@
+@code {
+    [CascadingParameter] public RouterState State { get; set; } = default!;
+}
+
+<h3>Profile for user @State.Parameters["userId"]</h3>
+<p>This is the profile component, rendered into the <code>UserLayout</code> outlet.</p>

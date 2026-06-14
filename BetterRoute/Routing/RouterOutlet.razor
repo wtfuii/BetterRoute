@@ -1,0 +1,8 @@
+@namespace BetterRoute.Routing
+
+@if (HasChild)
+{
+    <CascadingValue Value="ChildState" IsFixed="false">
+        <DynamicComponent Type="ChildComponent" />
+    </CascadingValue>
+}

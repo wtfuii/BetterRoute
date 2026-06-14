@@ -1,0 +1,6 @@
+@code {
+    [CascadingParameter] public RouterState State { get; set; } = default!;
+}
+
+<h3>Overview for user @State.Parameters["userId"]</h3>
+<p>Index page for one user. Pick profile or a post from the nav.</p>

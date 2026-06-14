@@ -1,0 +1,6 @@
+@code {
+    [CascadingParameter] public RouterState State { get; set; } = default!;
+}
+
+<h3>Post @State.Parameters["postId"] by user @State.Parameters["userId"]</h3>
+<p>Both <code>userId</code> (captured by an ancestor) and <code>postId</code> (captured here) are visible.</p>
