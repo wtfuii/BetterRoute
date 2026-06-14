@@ -1,16 +1,29 @@
 @code {
     [CascadingParameter] public RouterState State { get; set; } = default!;
+    [Inject] private NavigationManager Nav { get; set; } = default!;
+
+    private string UserId => State.GetParameter("userId")!;
 }
 
 <div style="border: 2px dashed #2a8c4a; padding: 12px; border-radius: 6px; margin-top: 8px;">
-    <h2 style="margin-top: 0;">User @State.GetParameter("userId")</h2>
+    <h2 style="margin-top: 0;">User @UserId</h2>
     <p style="color: #555;">Inner layout for one user. The <code>userId</code> parameter is visible here and to deeper levels.</p>
     <nav style="margin-bottom: 8px;">
-        <a href="users/@State.GetParameter("userId")">overview</a> ·
-        <a href="users/@State.GetParameter("userId")/profile">profile</a> ·
-        <a href="users/@State.GetParameter("userId")/search?q=blazor&sort=asc">search</a> ·
-        <a href="users/@State.GetParameter("userId")/posts/1">post 1</a> ·
-        <a href="users/@State.GetParameter("userId")/posts/2">post 2</a>
+        <a href="users/@UserId"
+           @onclick="@(() => Nav.NavigateTo($"users/{UserId}"))"
+           @onclick:preventDefault="true">overview</a> ·
+        <a href="users/@UserId/profile"
+           @onclick="@(() => Nav.NavigateTo($"users/{UserId}/profile"))"
+           @onclick:preventDefault="true">profile</a> ·
+        <a href="users/@UserId/search?q=blazor&sort=asc"
+           @onclick="@(() => Nav.NavigateTo($"users/{UserId}/search?q=blazor&sort=asc"))"
+           @onclick:preventDefault="true">search</a> ·
+        <a href="users/@UserId/posts/1"
+           @onclick="@(() => Nav.NavigateTo($"users/{UserId}/posts/1"))"
+           @onclick:preventDefault="true">post 1</a> ·
+        <a href="users/@UserId/posts/2"
+           @onclick="@(() => Nav.NavigateTo($"users/{UserId}/posts/2"))"
+           @onclick:preventDefault="true">post 2</a>
     </nav>
     <div style="display: flex; gap: 16px;">
         <div style="flex: 1; min-width: 0;">
