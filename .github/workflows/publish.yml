@@ -1,9 +1,8 @@
 name: Publish to NuGet
 
 on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'   # v1.0.0, v1.0.0-preview1, etc.
+  release:
+    types: [published]
 
 jobs:
   publish:
@@ -20,12 +19,13 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Extract version from tag
+      - name: Extract version from release tag
         run: |
-          # Strip leading 'v' from tag (v1.0.0 → 1.0.0)
-          VERSION="${GITHUB_REF_NAME#v}"
+          # Strip leading 'v' from release tag (v1.0.0 → 1.0.0)
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Version from tag: $VERSION"
+          echo "Version from release tag: $VERSION"
 
       - name: Restore dependencies
         run: dotnet restore BetterRoute.sln
