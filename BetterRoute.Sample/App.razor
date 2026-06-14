@@ -3,16 +3,16 @@
 <header style="padding: 12px 20px; border-bottom: 1px solid #ddd; background: #f7f7f9;">
     <strong>BetterRoute demo</strong>
     &nbsp;|&nbsp;
-    <a href="" @onclick="@(() => Nav.NavigateTo(""))" @onclick:preventDefault="true">home</a> ·
-    <a href="users" @onclick="@(() => Nav.NavigateTo("users"))" @onclick:preventDefault="true">users</a> ·
-    <a href="users/42/profile" @onclick="@(() => Nav.NavigateTo("users/42/profile"))" @onclick:preventDefault="true">user 42 profile</a> ·
-    <a href="users/42/posts/7" @onclick="@(() => Nav.NavigateTo("users/42/posts/7"))" @onclick:preventDefault="true">user 42 post 7</a> ·
-    <a href="users/42/search?q=blazor&sort=asc" @onclick="@(() => Nav.NavigateTo("users/42/search?q=blazor&sort=asc"))" @onclick:preventDefault="true">user 42 search</a> ·
-    <a href="users/99/profile" @onclick="@(() => Nav.NavigateTo("users/99/profile"))" @onclick:preventDefault="true">user 99 profile</a> ·
-    <a href="users/42/stats" @onclick="@(() => Nav.NavigateTo("users/42/stats"))" @onclick:preventDefault="true">user 42 stats (sidebar)</a> ·
-    <a href="profile" @onclick="@(() => Nav.NavigateTo("profile"))" @onclick:preventDefault="true">profile (redirect)</a> ·
-    <a href="home" @onclick="@(() => Nav.NavigateTo("home"))" @onclick:preventDefault="true">home (alias)</a> ·
-    <a href="ghost" @onclick="@(() => Nav.NavigateTo("ghost"))" @onclick:preventDefault="true">unknown</a>
+    <a href="/" @onclick="@(() => Nav.NavigateTo("/"))" @onclick:preventDefault="true">home</a> ·
+    <a href="/users" @onclick="@(() => Nav.NavigateTo("/users"))" @onclick:preventDefault="true">users</a> ·
+    <a href="/users/42/profile" @onclick="@(() => Nav.NavigateTo("/users/42/profile"))" @onclick:preventDefault="true">user 42 profile</a> ·
+    <a href="/users/42/posts/7" @onclick="@(() => Nav.NavigateTo("/users/42/posts/7"))" @onclick:preventDefault="true">user 42 post 7</a> ·
+    <a href="/users/42/search?q=blazor&sort=asc" @onclick="@(() => Nav.NavigateTo("/users/42/search?q=blazor&sort=asc"))" @onclick:preventDefault="true">user 42 search</a> ·
+    <a href="/users/99/profile" @onclick="@(() => Nav.NavigateTo("/users/99/profile"))" @onclick:preventDefault="true">user 99 profile</a> ·
+    <a href="/users/42/stats" @onclick="@(() => Nav.NavigateTo("/users/42/stats"))" @onclick:preventDefault="true">user 42 stats (sidebar)</a> ·
+    <a href="/profile" @onclick="@(() => Nav.NavigateTo("/profile"))" @onclick:preventDefault="true">profile (redirect)</a> ·
+    <a href="/home" @onclick="@(() => Nav.NavigateTo("/home"))" @onclick:preventDefault="true">home (alias)</a> ·
+    <a href="/ghost" @onclick="@(() => Nav.NavigateTo("/ghost"))" @onclick:preventDefault="true">unknown</a>
 </header>
 
 <main style="padding: 20px;">
